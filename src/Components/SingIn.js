@@ -52,7 +52,8 @@ export class SignIn extends Component {
         email: "",
         password: "",
         messages: [],
-        redirect: false
+        redirect: false,
+        wrongCred: false,
     }
     
     setRedirect = () => {
@@ -74,10 +75,16 @@ export class SignIn extends Component {
         e.preventDefault()
         if (this.state.email != "", this.state.password != "", this.state.email === "demo", this.state.password === "demo") {
           if (this.state.redirect) {
-            return <Redirect to='/home' />
+            return this.props.history.push('/home');
           }
+          this.setState({
+            wrongCred: false
+          })
         } else {
-
+          // alert("hi")
+          this.setState({
+            wrongCred: true
+          })
         }
     }
 
@@ -108,14 +115,15 @@ export class SignIn extends Component {
                         control={<Checkbox value="remember" color="primary" />}
                         label="Remember me"
                       />
-                      <Typography component="p" variant="h5">
-                        Sign in
+                      <Typography component="p" variant="subtitle1" style={{color: "red"}}>
+                        {this.state.wrongCred? "Please enter correct username and password" : ""}
                       </Typography>
                       <Button
                         type="submit"
                         fullWidth
                         variant="contained"
                         color="primary"
+                        onSubmit={this.submitForm}
                         onClick={this.handleSubmit}
                         className={classes.submit}
                       >
