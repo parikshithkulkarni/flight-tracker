@@ -88,15 +88,15 @@ class Airport extends React.Component {
                 {this.props.airport ? (
                     <Card >
                         <CardMedia style={{ height: 0, paddingTop: '56.25%' }}
-                            image={this.props.airport.fields}
+                            image={this.props.airport.homepage}
                             title={this.props.airport}
                         />
                         <CardContent>
                             <Typography gutterBottom variant="headline" component="h2">
-                                {this.props.airport}
+                                {this.props.airport.name}
                             </Typography>
                             <Typography component="p">
-                                {this.props.airport.fields}
+                                {this.props.airport.city}
                             </Typography>
                         </CardContent>
                         <CardActions>

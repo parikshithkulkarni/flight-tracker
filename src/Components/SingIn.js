@@ -11,11 +11,8 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import withStyles from '@material-ui/core/styles/withStyles';
-import { Redirect } from 'react-router-dom'
 import Checkbox from '@material-ui/core/Checkbox';
-import { Link } from 'react-router-dom';
 import { withRouter } from 'react-router'
-// import request from 'superagent'
 
 const styles = theme => ({
   main: {
@@ -66,7 +63,7 @@ export class SignIn extends Component {
 
   handleSubmit = (e) => {
     e.preventDefault()
-    if (this.state.email != "", this.state.password != "", this.state.email === "demo", this.state.password === "demo") {
+    if (this.state.email !== "", this.state.password !== "", this.state.email === "demo", this.state.password === "demo") {
       this.setState({
         wrongCred: false
       })

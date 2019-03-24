@@ -3,8 +3,7 @@ import './App.css';
 import NavBar from './Components/NavBar'
 import SingIn from './Components/SingIn';
 import AirportList from './Components/AirportList';
-import Route from 'react-router-dom/Route';
-import { BrowserRouter, Switch } from 'react-router-dom';
+import { BrowserRouter, Switch, Route } from 'react-router-dom';
 
 class App extends Component {
 
