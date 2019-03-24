@@ -13,6 +13,8 @@ import Typography from '@material-ui/core/Typography';
 import withStyles from '@material-ui/core/styles/withStyles';
 import { Redirect } from 'react-router-dom'
 import Checkbox from '@material-ui/core/Checkbox';
+import { Link } from 'react-router-dom';
+import { withRouter } from 'react-router'
 // import request from 'superagent'
 
 const styles = theme => ({
@@ -48,97 +50,85 @@ const styles = theme => ({
 });
 
 export class SignIn extends Component {
-    state = {
-        email: "",
-        password: "",
-        messages: [],
-        redirect: false,
-        wrongCred: false,
-    }
-    
-    setRedirect = () => {
+  state = {
+    email: "",
+    password: "",
+    wrongCred: false,
+  }
+
+  handleChange = (e) => {
+    const key = e.target.name;
+    const value = e.target.value;
+    this.setState({
+      [key]: value
+    })
+  }
+
+  handleSubmit = (e) => {
+    e.preventDefault()
+    if (this.state.email != "", this.state.password != "", this.state.email === "demo", this.state.password === "demo") {
       this.setState({
-        redirect: true
+        wrongCred: false
+      })
+      return this.props.history.push('/home');
+    } else {
+      this.setState({
+        wrongCred: true
       })
     }
+  }
 
-    handleChange = (e) => {
-        const key = e.target.name;
-        const value = e.target.value;
-
-        this.setState({
-            [key]: value
-        })
-    }
-
-    handleSubmit = (e) => {
-        e.preventDefault()
-        if (this.state.email != "", this.state.password != "", this.state.email === "demo", this.state.password === "demo") {
-          if (this.state.redirect) {
-            return this.props.history.push('/home');
-          }
-          this.setState({
-            wrongCred: false
-          })
-        } else {
-          // alert("hi")
-          this.setState({
-            wrongCred: true
-          })
-        }
-    }
-
-    render() {
-        const { classes } = this.props;
-        return (
-            <React.Fragment>
-                <CssBaseline />
-                <main className={classes.main}>
-                  <CssBaseline />
-                  <Paper className={classes.paper}>
-                    <Avatar className={classes.avatar}>
-                      <LockOutlinedIcon />
-                    </Avatar>
-                    <Typography component="h1" variant="h5">
-                      Sign in
+  render() {
+    const { classes } = this.props;
+    return (
+      <React.Fragment>
+        <CssBaseline />
+        <main className={classes.main}>
+          <CssBaseline />
+          <Paper className={classes.paper}>
+            <Avatar className={classes.avatar}>
+              <LockOutlinedIcon />
+            </Avatar>
+            <Typography component="h1" variant="h5">
+              Sign in
                     </Typography>
-                    <form className={classes.form}>
-                      <FormControl margin="normal" required fullWidth>
-                        <InputLabel htmlFor="email">Email Address</InputLabel>
-                        <Input id="email" name="email" autoComplete="email" onChange={this.handleChange} autoFocus />
-                      </FormControl>
-                      <FormControl margin="normal" required fullWidth>
-                        <InputLabel htmlFor="password">Password</InputLabel>
-                        <Input name="password" type="password" id="password" onChange={this.handleChange} autoComplete="current-password" />
-                      </FormControl>
-                      <FormControlLabel
-                        control={<Checkbox value="remember" color="primary" />}
-                        label="Remember me"
-                      />
-                      <Typography component="p" variant="subtitle1" style={{color: "red"}}>
-                        {this.state.wrongCred? "Please enter correct username and password" : ""}
-                      </Typography>
-                      <Button
-                        type="submit"
-                        fullWidth
-                        variant="contained"
-                        color="primary"
-                        onSubmit={this.submitForm}
-                        onClick={this.handleSubmit}
-                        className={classes.submit}
-                      >
-                        Sign in
+            <form className={classes.form}>
+              <FormControl margin="normal" required fullWidth>
+                <InputLabel htmlFor="email">Email Address</InputLabel>
+                <Input id="email" name="email" autoComplete="email" onChange={this.handleChange} autoFocus />
+              </FormControl>
+              <FormControl margin="normal" required fullWidth>
+                <InputLabel htmlFor="password">Password</InputLabel>
+                <Input name="password" type="password" id="password" onChange={this.handleChange} autoComplete="current-password" />
+              </FormControl>
+              <FormControlLabel
+                control={<Checkbox value="remember" color="primary" />}
+                label="Remember me"
+              />
+              <Typography component="p" variant="subtitle1" style={{ color: "red" }}>
+                {this.state.wrongCred ? "Please enter correct username and password" : ""}
+              </Typography>
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                color="primary"
+                onSubmit={this.submitForm}
+                onClick={this.handleSubmit}
+                className={classes.submit}
+              >
+                Sign in
                       </Button>
-                    </form>
-                  </Paper>
-                </main>
-            </React.Fragment>
-        )
-    }
+            </form>
+          </Paper>
+        </main>
+      </React.Fragment>
+    )
+  }
 }
 
 SignIn.propTypes = {
-    classes: PropTypes.object.isRequired,
+  classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(SignIn);
+export default withRouter(withStyles(styles)(SignIn))
