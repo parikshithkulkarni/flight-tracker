@@ -33,32 +33,15 @@ class AirportList extends Component {
                     .then(airports => { this.setState({ airports }) });
             });
     }
-    onSearchInputChange = (event) => {
-        console.log("Search changed ..." + event.target.value)
-        if (event.target.value) {
-            this.setState({ searchString: event.target.value })
-        } else {
-            this.setState({ searchString: '' })
-        }
-        this.getairports()
-    }
+
     render() {
         return (
             <div>
                 {this.state.airports ? (
-
                     <div>
                         <div style={{ display: (this.state.loaderState) ? 'flex' : 'none', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, backgroundColor: '#000', opacity: 0.5 }}>
                             <CircularProgress disableShrink />
                         </div>
-
-
-                        {/* <TextField style={{ padding: 24 }}
-                            id="searchInput"
-                            placeholder="Search for airports"
-                            margin="normal"
-                            onChange={this.onSearchInputChange}
-                        /> */}
                         <h1 margin="normal" style={{ padding: 34 }}> 10 Busiest Airports <i className="fa fa-plane"></i> </h1>
                         <Grid container spacing={24} style={{ padding: 24 }}>
                             {

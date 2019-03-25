@@ -54,7 +54,6 @@ class Airport extends React.Component {
 
     state = {
         open: false,
-        // airports: ['jfk', 'nyc', 'dal', 'dfw'],
         arrivalSearchString: 60,
         arrivalFlights: null,
         departureSearchString: 60,
@@ -154,9 +153,6 @@ class Airport extends React.Component {
                                             </Typography>
                                         </Toolbar>
                                     </AppBar>
-                                    {/* <Typography variant="subtitle1" id="simple-modal-description">
-                                        {this.props.airport.wikipedia}
-                                    </Typography> */}
                                     <Grid container spacing={24} style={{ padding: 24 }}>
                                         <Grid item xs={12} sm={6} lg={6} xl={6}>
                                             <TextField style={{ padding: 24 }}
@@ -165,12 +161,6 @@ class Airport extends React.Component {
                                                 margin="normal"
                                                 onChange={this.onSearchInputChange}
                                             />
-                                            {/* <Combobox
-                                                // onSelect={}
-                                                // onChange={}
-                                                defaultValue={"orange"}
-                                                data={['orange', 'red', 'blue', 'purple']}
-                                            /> */}
                                             {console.log(this.state.data)}
                                             <SimpleTable
                                                 data={this.state.arrivalFlights}
