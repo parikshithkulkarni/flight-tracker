@@ -13,6 +13,7 @@ import Typography from '@material-ui/core/Typography';
 import withStyles from '@material-ui/core/styles/withStyles';
 import Checkbox from '@material-ui/core/Checkbox';
 import { withRouter } from 'react-router'
+import Users from '../Data/users'
 
 const styles = theme => ({
   main: {
@@ -63,7 +64,7 @@ export class SignIn extends Component {
 
   handleSubmit = (e) => {
     e.preventDefault()
-    if (this.state.email !== "", this.state.password !== "", this.state.email === "demo", this.state.password === "demo") {
+    if (this.state.email !== "", this.state.password !== "", this.state.email === Users.username, this.state.password === Users.pasword) {
       this.setState({
         wrongCred: false
       })

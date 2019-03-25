@@ -9,26 +9,30 @@ import Modal from '@material-ui/core/Modal';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
+import SimpleTable from '../Components/SimpleTable'
+import Grid from '@material-ui/core/Grid';
+import Toolbar from '@material-ui/core/Toolbar'
+import AppBar from '@material-ui/core/AppBar'
+import BusiestAirport from '../Scripts/BusiestAirport'
+import debounce from 'lodash.debounce';
 
 function rand() {
     return Math.round(Math.random() * 20) - 10;
 }
 
 function getModalStyle() {
-    const top = 50 + rand();
-    const left = 50 + rand();
 
     return {
-        top: `${top}%`,
-        left: `${left}%`,
-        transform: `translate(-${top}%, -${left}%)`,
+        top: `${50}%`,
+        left: '50%',
+        transform: `translate(-50%,-50%)`,
     };
 }
 
 const styles = theme => ({
     paper: {
         position: 'absolute',
-        width: theme.spacing.unit * 50,
+        width: '80%',
         backgroundColor: theme.palette.background.paper,
         boxShadow: theme.shadows[5],
         padding: theme.spacing.unit * 4,
@@ -39,42 +43,74 @@ const styles = theme => ({
 class Airport extends React.Component {
     constructor(props) {
         super(props)
-        this.getairports()
+    }
+
+    componentDidMount() {
+    }
+
+    createData = (name, calories, fat, carbs, protein) => {
+        return { name, calories, fat, carbs, protein };
     }
 
     state = {
         open: false,
-        airports: ['jfk', 'nyc', 'dal', 'dfw'],
-        searchString: ''
+        // airports: ['jfk', 'nyc', 'dal', 'dfw'],
+        arrivalSearchString: 60,
+        arrivalFlights: null,
+        departureSearchString: 60,
+        departureFlights: null
     };
 
-    getairports = () => {
-        // fetch.getEntries({
-        //     content_type: 'airport',
-        //     query: this.state.searchString
-        // })
-        // .then((response) => {
-        this.setState({ airports: [this.state.searchString] })
-        //     console.log(this.state.airports)
-        // })
-        // .catch((error) => {
-        //   console.log("Error occurred while fetching Entries")
-        //   console.error(error)
-        // })
+    getArrivalDepartureflights = (isArrival = false, isDeparture = false) => {
+        // return;
+        const airport = new BusiestAirport();
+        console.log('getflightscalled');
+
+        /* FOR ARRIVAL FLIGHTS */
+        if (isArrival) {
+            airport.getArrivalOrDepartureFlights(this.state.arrivalSearchString, this.props.airport.icao)
+                .then(flights => {
+                    console.log(flights);
+                    console.log('getflights', this.props.airport.icao);
+                    // airport.getBusiestAirportDetails(flights, 30)
+                    this.setState({ arrivalFlights: flights.slice(0, 10) })
+                    this.setState({ open: true });
+                    this.props.loader(false);
+                });
+        }
+
+        if (isDeparture) {
+            /* FOR DEPARTURE FLIGHTS */
+            airport.getArrivalOrDepartureFlights(this.state.departureSearchString, this.props.airport.icao, false)
+                .then(flights => {
+                    console.log(flights);
+                    console.log('getflights', this.props.airport.icao);
+                    // airport.getBusiestAirportDetails(flights, 30)
+                    this.setState({ departureFlights: flights.slice(0, 10) })
+                    this.setState({ open: true });
+                    this.props.loader(false);
+                });
+        }
+
     }
 
     onSearchInputChange = (event) => {
-        console.log("Search changed ..." + event.target.value)
-        if (event.target.value) {
-            this.setState({ searchString: event.target.value })
+
+        console.log('debounce')
+        if (!event.target.value) return;
+        if (event.currentTarget.id === "searchArrivalInput") {
+            this.setState({ arrivalSearchString: event.target.value })
+            this.getArrivalDepartureflights(true, false);
         } else {
-            this.setState({ searchString: '' })
+            this.setState({ departureSearchString: event.target.value })
+            this.getArrivalDepartureflights(false, true);
         }
-        this.getairports()
+        console.log(debounce);
     }
 
     handleOpen = () => {
-        this.setState({ open: true });
+        this.getArrivalDepartureflights(true, true);
+        this.props.loader(true);
     };
 
     handleClose = () => {
@@ -82,13 +118,14 @@ class Airport extends React.Component {
     };
 
     render() {
+
         const { classes } = this.props;
         return (
             <div>
                 {this.props.airport ? (
                     <Card >
                         <CardMedia style={{ height: 0, paddingTop: '56.25%' }}
-                            image={this.props.airport.homepage}
+                            image={'http://lorempixel.com/400/200/city/'+Math.floor(Math.random(0,1)*10)}
                             title={this.props.airport}
                         />
                         <CardContent>
@@ -96,7 +133,7 @@ class Airport extends React.Component {
                                 {this.props.airport.name}
                             </Typography>
                             <Typography component="p">
-                                {this.props.airport.city}
+                                {this.props.airport.municipality}, {this.props.airport.region.split('-')[1]}, {this.props.airport.country}
                             </Typography>
                         </CardContent>
                         <CardActions>
@@ -110,18 +147,46 @@ class Airport extends React.Component {
                                 onClose={this.handleClose}
                             >
                                 <div style={getModalStyle()} className={classes.paper}>
-                                    <TextField style={{ padding: 24 }}
-                                        id="searchInput"
-                                        placeholder="Search for airports"
-                                        margin="normal"
-                                        onChange={this.onSearchInputChange}
-                                    />
-                                    <Typography variant="h6" id="modal-title">
-                                        Text in a modal
-                                </Typography>
-                                    <Typography variant="subtitle1" id="simple-modal-description">
-                                        Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
-                                </Typography>
+                                    <AppBar >
+                                        <Toolbar>
+                                            <Typography variant="h6" id="modal-title" color="inherit" variant="title">
+                                                ICAO number: {this.props.airport.icao}
+                                            </Typography>
+                                        </Toolbar>
+                                    </AppBar>
+                                    {/* <Typography variant="subtitle1" id="simple-modal-description">
+                                        {this.props.airport.wikipedia}
+                                    </Typography> */}
+                                    <Grid container spacing={24} style={{ padding: 24 }}>
+                                        <Grid item xs={12} sm={6} lg={6} xl={6}>
+                                            <TextField style={{ padding: 24 }}
+                                                id="searchArrivalInput"
+                                                placeholder="Arrival in last X mins"
+                                                margin="normal"
+                                                onChange={this.onSearchInputChange}
+                                            />
+                                            {/* <Combobox
+                                                // onSelect={}
+                                                // onChange={}
+                                                defaultValue={"orange"}
+                                                data={['orange', 'red', 'blue', 'purple']}
+                                            /> */}
+                                            {console.log(this.state.data)}
+                                            <SimpleTable
+                                                data={this.state.arrivalFlights}
+
+                                            />
+                                        </Grid>
+                                        <Grid item xs={12} sm={6} lg={6} xl={6}>
+                                            <TextField style={{ padding: 24 }}
+                                                id="searchDepartureInput"
+                                                placeholder="Departure in last X mins"
+                                                margin="normal"
+                                                onChange={this.onSearchInputChange}
+                                            />
+                                            <SimpleTable data={this.state.departureFlights} />
+                                        </Grid>
+                                    </Grid>
                                     <AirportlWrapped />
                                 </div>
                             </Modal>

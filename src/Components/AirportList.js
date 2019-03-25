@@ -1,41 +1,37 @@
 import React, { Component } from 'react'
 import Grid from '@material-ui/core/Grid';
-import TextField from '@material-ui/core/TextField';
-import * as contentful from 'contentful'
 import Airport from '../Components/Airport'
-import OpenSkyAPI from '../Components/OpenSkyAPI'
-import BusiestAirport from '../Components/BusiestAirport'
-import FlightsData from '../Components/flightsData'
+import BusiestAirport from '../Scripts/BusiestAirport'
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 class AirportList extends Component {
     state = {
-        // airports: ['jfk', 'nyc', 'dal', 'dfw'],
-        flights: FlightsData.flightsApp,
+        flights: null,
         airports: null,
-        searchString: ''
+        searchString: '',
+        loaderState: false
     }
     constructor() {
         super()
-        
+        this.loadingHandler = this.loadingHandler.bind(this)
     }
     componentDidMount() {
         this.getairports()
     }
+
+    loadingHandler(status) {
+        this.setState({
+            loaderState: status
+        })
+    }
+
     getairports = () => {
-        // fetch.getEntries({
-        //     content_type: 'airport',
-        //     query: this.state.searchString
-        // })
-        // .then((response) => {
         const airport = new BusiestAirport();
-        airport.getBusiestAirportDetails(this.state.flights, 10)
-            .then(airports => { this.setState({ airports })});
-        //     console.log(this.state.airports)
-        // })
-        // .catch((error) => {
-        //   console.log("Error occurred while fetching Entries")
-        //   console.error(error)
-        // })
+        airport.getAllFlights()
+            .then(flights => {
+                airport.getBusiestAirportDetails(flights, 10)
+                    .then(airports => { this.setState({ airports }) });
+            });
     }
     onSearchInputChange = (event) => {
         console.log("Search changed ..." + event.target.value)
@@ -50,21 +46,27 @@ class AirportList extends Component {
         return (
             <div>
                 {this.state.airports ? (
+
                     <div>
-                        <TextField style={{ padding: 24 }}
+                        <div style={{ display: (this.state.loaderState) ? 'flex' : 'none', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, backgroundColor: '#000', opacity: 0.5 }}>
+                            <CircularProgress disableShrink />
+                        </div>
+
+
+                        {/* <TextField style={{ padding: 24 }}
                             id="searchInput"
                             placeholder="Search for airports"
                             margin="normal"
                             onChange={this.onSearchInputChange}
-                        />
+                        /> */}
                         <h1 margin="normal" style={{ padding: 34 }}> 10 Busiest Airports <i className="fa fa-plane"></i> </h1>
                         <Grid container spacing={24} style={{ padding: 24 }}>
-                            { 
-                                this.state.airports.map((currentairport,i) => (
-                                <Grid key={i} item xs={12} sm={6} lg={4} xl={3}>
-                                    <Airport airport={currentairport} />
-                                </Grid>
-                            ))}
+                            {
+                                this.state.airports.map((currentairport, i) => (
+                                    <Grid key={i} item xs={12} sm={4} lg={3} xl={2}>
+                                        <Airport loader={this.loadingHandler} airport={currentairport} />
+                                    </Grid>
+                                ))}
                         </Grid>
                     </div>
                 ) : "No airports found"}

@@ -1,4 +1,4 @@
-import OpenSkyAPI from '../Components/OpenSkyAPI'
+import OpenSkyAPI from './OpenSkyAPI'
 
 class BusiestAirport extends OpenSkyAPI {
 
@@ -7,10 +7,46 @@ class BusiestAirport extends OpenSkyAPI {
     }
 
     /**
+     * Return an array of all flights within a 
+     * given interval
+    */
+    getAllFlights(from, to) {
+        /* 1hr = 3600s 1day = 86400s */
+        // Math.floor(new Date().getTime()/1000.0) getTime()
+        const currentTimeInEpoch = Math.floor(Date.now() / 1000);
+        const begin = currentTimeInEpoch - (3600 * 48),
+            end = begin + 3600;
+
+        return fetch(this.getAllFlightsURL(begin, end))
+            .then(response => response.json())
+            .catch(error => console.error(error));
+    }
+
+    /**
+    * Return an array of all flights within a 
+    * given interval
+   */
+    getArrivalOrDepartureFlights(fromTime, airportIcaoCode, isArrival = true) {
+        /* 1hr = 3600s 1day = 86400s */
+        // Math.floor(new Date().getTime()/1000.0) getTime()
+        const currentTimeInEpoch = Math.floor(Date.now() / 1000);
+        const begin = currentTimeInEpoch - (3600 * 48),
+            end = begin + (fromTime * 60);
+
+        const url = (isArrival) ? this.getArrivalFlightsURL(airportIcaoCode, begin, end) : this.getDepartureFlightsURL(airportIcaoCode, begin, end);
+
+        console.log(url);
+
+        return fetch(url)
+            .then(response => response.json())
+            .catch(error => console.error(error));
+    }
+
+    /**
      * Gets the Top X Busiest Airports' Detail Info
     */
     getBusiestAirportDetails(flights, howMany = 10) {
-        if(!flights) {
+        if (!flights) {
             throw "FLights Undefined";
         }
         const icaoCodesArr = this.getBusiestAirportIcaoCodes(flights, howMany);
@@ -65,21 +101,8 @@ class BusiestAirport extends OpenSkyAPI {
                 return fetch(this.getAirportURL(icao))
             }
         );
-        return Promise.all(requestsArr)
-            .then(responses => Promise.all(responses.map(r => r.json())));
+        return Promise.all(requestsArr).then(responses => Promise.all(responses.map(r => r.json())));
     }
-
-
-    /**
-    */
-    static airportInfoDetailHtmlFormatter(airport) {
-        const airportState = airport.region.split('-')[1];
-        const html = `${airport.name}`
-            + `(${airport.municipality}, ${airportState}, ${airport.country})`
-            + `<br>`;
-        return html;
-    }
-
 }
 
 export default BusiestAirport;

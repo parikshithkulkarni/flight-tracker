@@ -3,15 +3,15 @@ import AppBar from '@material-ui/core/AppBar'
 import Toolbar from '@material-ui/core/Toolbar'
 import Typography from '@material-ui/core/Typography'
 const NavBar = () => {
-    return(
+    return (
         <div>
-        <AppBar position="static">
-            <Toolbar>
-                <Typography variant="title" color="inherit">
-                OpenSky Flight Tracker
+            <AppBar position="static">
+                <Toolbar>
+                    <Typography variant="title" color="inherit">
+                        OpenSky Flight Tracker
                 </Typography>
-            </Toolbar>
-        </AppBar>
+                </Toolbar>
+            </AppBar>
         </div>
     )
 }
