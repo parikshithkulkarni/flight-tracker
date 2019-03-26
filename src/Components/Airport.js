@@ -67,10 +67,10 @@ class Airport extends React.Component {
 
         /* FOR ARRIVAL FLIGHTS */
         if (isArrival) {
-            airport.getArrivalOrDepartureFlights(this.state.arrivalSearchString, this.props.airport.icao)
+            airport.getArrivalOrDepartureFlights(this.state.arrivalSearchString, this.props.airport.codeIcaoAirport)
                 .then(flights => {
                     console.log(flights);
-                    console.log('getflights', this.props.airport.icao);
+                    console.log('getflights', this.props.airport.codeIcaoAirport);
                     // airport.getBusiestAirportDetails(flights, 30)
                     this.setState({ arrivalFlights: flights.slice(0, 10) })
                     this.setState({ open: true });
@@ -80,10 +80,10 @@ class Airport extends React.Component {
 
         if (isDeparture) {
             /* FOR DEPARTURE FLIGHTS */
-            airport.getArrivalOrDepartureFlights(this.state.departureSearchString, this.props.airport.icao, false)
+            airport.getArrivalOrDepartureFlights(this.state.departureSearchString, this.props.airport.codeIcaoAirport, false)
                 .then(flights => {
                     console.log(flights);
-                    console.log('getflights', this.props.airport.icao);
+                    console.log('getflights', this.props.airport.codeIcaoAirport);
                     // airport.getBusiestAirportDetails(flights, 30)
                     this.setState({ departureFlights: flights.slice(0, 10) })
                     this.setState({ open: true });
@@ -129,10 +129,10 @@ class Airport extends React.Component {
                         />
                         <CardContent>
                             <Typography gutterBottom variant="headline" component="h2">
-                                {this.props.airport.name}
+                                {this.props.airport.nameAirport}
                             </Typography>
                             <Typography component="p">
-                                {this.props.airport.municipality}, {this.props.airport.region.split('-')[1]}, {this.props.airport.country}
+                                {this.props.airport.codeIataCity}, {this.props.airport.nameCountry}
                             </Typography>
                         </CardContent>
                         <CardActions>
@@ -149,7 +149,7 @@ class Airport extends React.Component {
                                     <AppBar >
                                         <Toolbar>
                                             <Typography variant="h6" id="modal-title" color="inherit" variant="title">
-                                                ICAO number: {this.props.airport.icao}
+                                                ICAO number: {this.props.airport.codeIcaoAirport}
                                             </Typography>
                                         </Toolbar>
                                     </AppBar>

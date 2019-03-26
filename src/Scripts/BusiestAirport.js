@@ -2,23 +2,64 @@ import OpenSkyAPI from './OpenSkyAPI'
 
 class BusiestAirport extends OpenSkyAPI {
 
+    flights = [];
+    allAirports = new Map();
+    busiestAirports = [];
+
     constructor() {
         super();
     }
 
     /**
-     * Return an array of all flights within a 
+     * Returns all the airports according to icao Codes
+     * and saves it in the allAirports Map.
+     */
+    getAllAirports() {
+        const airportsIcaoDataMap = sessionStorage.getItem('airportsIcaoDataMap');
+        if(airportsIcaoDataMap) {
+            return new Promise((resolve, reject) => {
+                this.setAirportsMap(JSON.parse(airportsIcaoDataMap));
+                console.log('fromSession', this.allAirports);
+                resolve(this.allAirports);
+            });
+        }
+
+        return fetch(this.getAllAirportsURL())
+            .then(response => response.json())
+            .then(data => {
+                sessionStorage.setItem('airportsIcaoDataMap', JSON.stringify(data));
+                this.setAirportsMap(data);
+                console.log('fromAviationEdgeApi', this.allAirports);
+                return this.allAirports;
+            })
+            .catch(err => console.erorr(err))
+    }
+
+    setAirportsMap(data) {
+        data.forEach(d => {
+            if(d.codeIcaoAirport) {
+                this.allAirports.set(d.codeIcaoAirport, d);
+            }
+        });
+    }
+
+    /**
+     * Return an array of all flights within a
      * given interval
-    */
+     */
     getAllFlights(from, to) {
         /* 1hr = 3600s 1day = 86400s */
         // Math.floor(new Date().getTime()/1000.0) getTime()
-        const currentTimeInEpoch = Math.floor(Date.now() / 1000);
-        const begin = currentTimeInEpoch - (3600 * 48),
+        const currentTimeInEpoch = Math.floor(Date.now()/1000);
+        const begin = currentTimeInEpoch - (3600*24),
             end = begin + 3600;
 
-        return fetch(this.getAllFlightsURL(begin, end))
+        return fetch(this.getAllFlightsURL(begin,end))
             .then(response => response.json())
+            .then(resp => {
+                this.flights = resp;
+                return resp;
+            })
             .catch(error => console.error(error));
     }
 
@@ -44,27 +85,36 @@ class BusiestAirport extends OpenSkyAPI {
 
     /**
      * Gets the Top X Busiest Airports' Detail Info
-    */
-    getBusiestAirportDetails(flights, howMany = 10) {
-        if (!flights) {
-            throw "FLights Undefined";
-        }
-        const icaoCodesArr = this.getBusiestAirportIcaoCodes(flights, howMany);
+     */
+    getBusiestAirportDetails(howMany = 10) {
+        const allSortedAirportsCode = this.getBusiestAirportIcaoCodes();
+        const busiestAirport = [];
 
-        return this.fetchAirportDetailsFromIcaoCodes(icaoCodesArr);
+        let counter=0;
+        while(counter < howMany) {
+            const airportCode = allSortedAirportsCode[counter];
+            if(this.allAirports.get(airportCode)) {
+                busiestAirport.push(this.allAirports.get(airportCode))
+                counter++;
+            }
+        }
+
+        this.busiestAirports = busiestAirport;
+
+        return this.busiestAirports;
     }
 
 
     /**
      * Gets the Top X Busiest Airports' Icao Codes
-    */
-    getBusiestAirportIcaoCodes(flights, howMany = 10) {
-        const flightsAtAirport = this.getAllFlightsAtAirport(flights);
+     */
+    getBusiestAirportIcaoCodes() {
+        if(!this.flights) throw "No Flight Data Avaialble";
+        const flightsAtAirport = this.getAllFlightsAtAirport(this.flights);
         return Object.keys(flightsAtAirport)
-            .sort((a, b) => {
-                return flightsAtAirport[b] - flightsAtAirport[a];
-            })
-            .slice(0, howMany);
+            .sort((a,b) => {
+                return flightsAtAirport[b]- flightsAtAirport[a];
+            });
     }
 
     /**
@@ -72,6 +122,7 @@ class BusiestAirport extends OpenSkyAPI {
      * all the airports based on flights info
     */
     getAllFlightsAtAirport(flights) {
+        if(!flights) throw "Flights is undefined";
         const flightsAtAirport = {};
         console.log(flights);
         flights.forEach((d) => {

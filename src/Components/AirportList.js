@@ -26,12 +26,27 @@ class AirportList extends Component {
     }
 
     getairports = () => {
+
         const airport = new BusiestAirport();
+
+        const promise1 = airport.getAllAirports(),
+              promise2 = airport.getAllFlights();
+
+        Promise.all([promise1, promise2])
+            .then(d => {
+                let airports = airport.getBusiestAirportDetails(10)
+                console.log(airports);
+                this.setState({ airports });
+            });
+/*
+        const airport = new BusiestAirport();
+
         airport.getAllFlights()
             .then(flights => {
                 airport.getBusiestAirportDetails(flights, 10)
                     .then(airports => { this.setState({ airports }) });
             });
+*/
     }
 
     render() {
